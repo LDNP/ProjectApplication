@@ -5,6 +5,9 @@ workflows:
   build:
     jobs:
       - build_frontend
+      - test_all:
+          requires:
+            - build_frontend
 
 jobs:
   build_frontend:
@@ -24,9 +27,7 @@ jobs:
       - run:
           name: Install dependencies
           command: npm install
-      - run:
-          name: Run frontend tests
-          command: npm run test -- --ci --silent --reporters=default  # Run Jest tests in CI mode
+
       - run:
           name: Build React app
           command: npm run build
@@ -34,18 +35,19 @@ jobs:
       - save_cache:
           paths:
             - ~/.npm
+            - ./node_modules
           key: dependency-cache-{{ checksum "package-lock.json" }}
-test_backend:
+
+  test_all:
     docker:
       - image: cimg/node:18.20.7
     working_directory: ~/ProjectApplication
     steps:
       - checkout
 
-      - run:
-          name: Install backend dependencies
-          command: npm install
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
 
       - run:
-          name: Run backend tests
-          command: npm run test:backend  # Run backend tests with Jest         
+          name: Run both frontend and backend tests
+          command: npm run test:all  # Runs the "test:all" script to run both frontend and backend tests concurrently

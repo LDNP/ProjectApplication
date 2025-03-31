@@ -5,9 +5,6 @@ workflows:
   build:
     jobs:
       - build_frontend
-      - start_backend:
-          requires:
-            - build_frontend
 
 jobs:
   build_frontend:
@@ -36,18 +33,3 @@ jobs:
           paths:
             - ~/.npm
           key: dependency-cache-{{ checksum "package-lock.json" }}
-
-  start_backend:
-    docker:
-      - image: cimg/node:18.20.7
-    working_directory: ~/ProjectApplication
-    steps:
-      - checkout
-
-      - run:
-          name: Install backend dependencies
-          command: npm install --only=production
-
-      - run:
-          name: Start backend server
-          command: node server.js

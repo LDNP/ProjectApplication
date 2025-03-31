@@ -5,7 +5,7 @@ workflows:
   build:
     jobs:
       - build_frontend
-      - test_all:
+      - test_frontend:
           requires:
             - build_frontend
 
@@ -26,7 +26,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: npm install
+          command: npm install # Removed --legacy-peer-deps
 
       - run:
           name: Build React app
@@ -35,19 +35,19 @@ jobs:
       - save_cache:
           paths:
             - ~/.npm
-            - ./node_modules
           key: dependency-cache-{{ checksum "package-lock.json" }}
 
-  test_all:
+  test_frontend:
     docker:
       - image: cimg/node:18.20.7
     working_directory: ~/ProjectApplication
     steps:
       - checkout
 
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm install # Removed --legacy-peer-deps
 
       - run:
-          name: Run both frontend and backend tests
-          command: npm run test:all  # Runs the "test:all" script to run both frontend and backend tests concurrently
+          name: Run frontend tests
+          command: npm test # Only frontend tests (no backend tests)

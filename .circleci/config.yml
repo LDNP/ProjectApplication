@@ -1,0 +1,53 @@
+version: 2.1
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build_frontend
+      - start_backend:
+          requires:
+            - build_frontend
+
+jobs:
+  build_frontend:
+    working_directory: ~/ProjectApplication
+    docker:
+      - image: cimg/node:18.20.7
+    steps:
+      - checkout
+
+      - run:
+          name: Update npm version
+          command: npm install -g npm@10.8.2  
+
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: Install dependencies
+          command: npm install
+
+      - run:
+          name: Build React app
+          command: npm run build
+
+      - save_cache:
+          paths:
+            - ~/.npm
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+
+  start_backend:
+    docker:
+      - image: cimg/node:18.20.7
+    working_directory: ~/ProjectApplication
+    steps:
+      - checkout
+
+      - run:
+          name: Install backend dependencies
+          command: npm install --only=production
+
+      - run:
+          name: Start backend server
+          command: node server.js

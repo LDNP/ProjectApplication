@@ -26,7 +26,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: npm install # Removed --legacy-peer-deps
+          command: npm install
 
       - run:
           name: Build React app
@@ -46,8 +46,8 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: npm install # Removed --legacy-peer-deps
+          command: npm install 
 
       - run:
           name: Run frontend tests
-          command: npm test # Only frontend tests (no backend tests)
+          command: npm test 

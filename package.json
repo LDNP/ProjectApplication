@@ -57,8 +57,13 @@
     ]
   },
   "jest": {
-    "collectCoverageFrom": ["src/**/*.{js,jsx}"],
-    "coverageReporters": ["html", "text"],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}"
+    ],
+    "coverageReporters": [
+      "html",
+      "text"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 80,

@@ -4,13 +4,10 @@ workflows:
   version: 2
   build:
     jobs:
-      - build_frontend
-      - test_frontend:
-          requires:
-            - build_frontend
+      - build
 
 jobs:
-  build_frontend:
+  build:
     working_directory: ~/ProjectApplication
     docker:
       - image: cimg/node:18.20.7
@@ -32,22 +29,11 @@ jobs:
           name: Build React app
           command: npm run build
 
+      - run:
+          name: Run tests
+          command: npm test
+
       - save_cache:
           paths:
             - ~/.npm
           key: dependency-cache-{{ checksum "package-lock.json" }}
-
-  test_frontend:
-    docker:
-      - image: cimg/node:18.20.7
-    working_directory: ~/ProjectApplication
-    steps:
-      - checkout
-
-      - run:
-          name: Install dependencies
-          command: npm install 
-
-      - run:
-          name: Run frontend tests
-          command: npm test 

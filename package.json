@@ -56,18 +56,17 @@
       "@babel/preset-react"
     ]
   },
- "jest": {
-  "collectCoverageFrom": ["src/**/*.{js,jsx}"],
-  "coverageReporters": ["html", "text"],
-  "coverageThreshold": {
-    "global": {
-      "branches": 80,
-      "functions": 80,
-      "lines": 80,
-      "statements": 80
-    }
-  }
-}
+  "jest": {
+    "collectCoverageFrom": ["src/**/*.{js,jsx}"],
+    "coverageReporters": ["html", "text"],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     },

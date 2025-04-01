@@ -20,12 +20,12 @@ workflows:
 jobs:
   build:
     docker:
-      - image: cimg/node:16
+      - image: cimg/node:16.20.2
     steps:
       - checkout
       - run:
           name: Update npm version
-          command: npm install -g npm@10.8.2
+          command: npm install -g npm@8.19.4
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:

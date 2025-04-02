@@ -76,7 +76,7 @@ app.delete('/books/:id', (req, res) => {
 });
 
 // Catch-all for React frontend
-app.get('*', (req, res) => {
+app.get('*', (_, res) => {
   res.sendFile(path.join(buildPath, 'index.html'));
 });
 

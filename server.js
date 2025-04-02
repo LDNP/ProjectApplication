@@ -4,17 +4,29 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
 const https = require('https');
+const morgan = require('morgan');
 
 // Initialize Express app
 const app = express();
+
+// Logging middleware
+app.use(morgan('combined'));
 
 // Enable CORS to allow communication with frontend (React)
 app.use(cors());
 app.use(bodyParser.json()); // Parse JSON request bodies
 
 // Serve static files from React's build folder - MOVED BEFORE API ROUTES
-app.use(express.static(path.join(__dirname, 'build')));
+const buildPath = path.join(__dirname, 'build');
+console.log('Serving static files from:', buildPath);
+
+// Verify build folder exists
+if (!fs.existsSync(buildPath)) {
+  console.error('Build folder does not exist at:', buildPath);
+}
+app.use(express.static(buildPath));
 
 // Initialize SQLite database
 const db = new sqlite3.Database('./books.db', (err) => {
@@ -34,7 +46,7 @@ db.run(`
   )
 `);
 
-// API Routes - Moved under /api prefix
+// API Routes
 app.get('/api', (_, res) => {
   res.send('Hello from the backend!');
 });
@@ -66,7 +78,7 @@ app.put('/books/:id', (req, res) => {
   const { title, author } = req.body;
   const { id } = req.params;
   const query = 'UPDATE books SET title = ?, author = ? WHERE id = ?';
-
+  
   db.run(query, [title, author, id], function(err) {
     if (err) {
       res.status(500).json({ message: 'Error updating book' });
@@ -81,7 +93,7 @@ app.put('/books/:id', (req, res) => {
 app.delete('/books/:id', (req, res) => {
   const { id } = req.params;
   const query = 'DELETE FROM books WHERE id = ?';
-
+  
   db.run(query, [id], function(err) {
     if (err) {
       res.status(500).json({ message: 'Error deleting book' });
@@ -95,7 +107,16 @@ app.delete('/books/:id', (req, res) => {
 
 // Serve React index.html for unknown routes (for React Router)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  console.log('Serving React app for route:', req.url);
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
+
+// HTTP Server
+const httpPort = process.env.HTTP_PORT || 3000;
+const httpServer = http.createServer(app);
+
+httpServer.listen(httpPort, '0.0.0.0', () => {
+  console.log(`HTTP server running on port ${httpPort}`);
 });
 
 // SSL/TLS options from certs folder
@@ -104,7 +125,7 @@ const httpsOptions = {
   cert: fs.readFileSync(path.join(__dirname, 'certs', 'server.crt')),
 };
 
-// Add error handling for HTTPS server
+// HTTPS Server
 const httpsPort = process.env.HTTPS_PORT || 8443;
 const httpsServer = https.createServer(httpsOptions, app);
 
@@ -116,4 +137,16 @@ httpsServer.listen(httpsPort, '0.0.0.0', () => {
   console.log(`HTTPS server running on port ${httpsPort}`);
 });
 
-module.exports = { app };
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('Closing database connection...');
+  db.close((err) => {
+    if (err) {
+      console.error('Error closing database:', err.message);
+    }
+    console.log('Database connection closed.');
+    process.exit(0);
+  });
+});
+
+module.exports = { app, httpServer, httpsServer };

@@ -15,12 +15,13 @@ pm2 stop project_app || true
 # Install backend dependencies
 npm install
 
-# Recreate certs (from environment variables set in CircleCI)
-echo $PRIVATE_KEY > privatekey.pem 
-echo $SERVER > server.crt 
+# Create certs directory and save certificates from environment variables
+mkdir -p certs
+echo "$PRIVATE_KEY" > certs/privatekey.pem 
+echo "$SERVER" > certs/server.crt 
 
 # Build the frontend (only if needed)
-npm run build
+NODE_OPTIONS=--openssl-legacy-provider npm run build
 
 # Start the application with PM2
 pm2 start server.js --name project_app

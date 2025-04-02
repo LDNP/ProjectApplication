@@ -101,10 +101,9 @@ app.delete('/books/:id', (req, res) => {
   });
 });
 
-// Serve React index.html for unknown routes (for React Router)
 app.get('*', (req, res) => {
-  console.log('Serving React app for route:', req.url);
-  res.sendFile(path.join(buildPath, 'index.html'));
+  console.log('Serving index.html for route:', req.url);
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 // HTTP Server

@@ -6,19 +6,15 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const morgan = require('morgan');
 
 // Initialize Express app
 const app = express();
-
-// Logging middleware
-app.use(morgan('combined'));
 
 // Enable CORS to allow communication with frontend (React)
 app.use(cors());
 app.use(bodyParser.json()); // Parse JSON request bodies
 
-// Serve static files from React's build folder - MOVED BEFORE API ROUTES
+// Serve static files from React's build folder
 const buildPath = path.join(__dirname, 'build');
 console.log('Serving static files from:', buildPath);
 

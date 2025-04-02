@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
+const path = require('path');
 
 // Initialize Express app
 const app = express();
@@ -28,14 +29,12 @@ db.run(`
   )
 `);
 
-// Routes
+// API Routes
 
-// Test Route to ensure server is running
 app.get('/', (_, res) => {
   res.send('Hello from the backend!');
 });
 
-// Get all books from the database
 app.get('/books', (_, res) => {
   db.all('SELECT * FROM books', (err, rows) => {
     if (err) {
@@ -46,7 +45,6 @@ app.get('/books', (_, res) => {
   });
 });
 
-// Add a new book to the database
 app.post('/books', (req, res) => {
   const { title, author } = req.body;
   const query = 'INSERT INTO books (title, author) VALUES (?, ?)';
@@ -60,7 +58,6 @@ app.post('/books', (req, res) => {
   });
 });
 
-// Update a book in the database
 app.put('/books/:id', (req, res) => {
   const { title, author } = req.body;
   const { id } = req.params;
@@ -77,7 +74,6 @@ app.put('/books/:id', (req, res) => {
   });
 });
 
-// Delete a book from the database
 app.delete('/books/:id', (req, res) => {
   const { id } = req.params;
   const query = 'DELETE FROM books WHERE id = ?';
@@ -92,10 +88,19 @@ app.delete('/books/:id', (req, res) => {
     }
   });
 });
-const port = process.env.PORT || 5000;
+
+// Serve static files from React's build folder
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Serve React index.html for unknown routes (for React Router)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 // Server startup
+const port = process.env.PORT || 5000;
 const server = app.listen(port, () => {
   console.log(`Backend running on http://localhost:${port}`);
 });
 
-module.exports = { app, server }; // Export both app and server
+module.exports = { app, server };

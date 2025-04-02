@@ -10,24 +10,24 @@ function App() {
 
   // Fetch books on mount
   useEffect(() => {
-    axios.get('http://localhost:5000/books')
+    axios.get('/books')
       .then(response => setBooks(response.data))
       .catch(error => console.error('Error fetching books:', error));
-  }, []);  // Empty dependency array to fetch books only once when the component mounts
+  }, []);
 
   // Handle form submission (add or update)
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (isEditing) {
-      axios.put(`http://localhost:5000/books/${currentBookId}`, { title, author })
+      axios.put(`/books/${currentBookId}`, { title, author })
         .then(response => {
           setBooks(books.map(book => (book.id === currentBookId ? response.data : book)));
           resetForm();
         })
         .catch(error => console.error('Error updating book:', error));
     } else {
-      axios.post('http://localhost:5000/books', { title, author })
+      axios.post('/books', { title, author })
         .then(response => {
           setBooks([...books, response.data]);
           resetForm();
@@ -46,7 +46,7 @@ function App() {
 
   // Delete a book
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:5000/books/${id}`)
+    axios.delete(`/books/${id}`)
       .then(() => {
         setBooks(books.filter(book => book.id !== id));
       })

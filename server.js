@@ -2,9 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
-const path = require('path');
-const https = require('https');
-const fs = require('fs');
 
 // Initialize Express app
 const app = express();
@@ -90,15 +87,10 @@ app.delete('/books/:id', (req, res) => {
   });
 });
 
-// Serve static files from React build
-app.use(express.static(path.join(__dirname, 'build')));
-
-// Serve index.html on unknown routes (React Router fallback)
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-// SSL/TLS options from certs folder
+// SSL/TLS options from certs folder (if using HTTPS)
+const fs = require('fs');
+const https = require('https');
+const path = require('path');
 const httpsOptions = {
   key: fs.readFileSync(path.join(__dirname, 'certs', 'privatekey.pem')),
   cert: fs.readFileSync(path.join(__dirname, 'certs', 'server.crt')),
@@ -106,8 +98,14 @@ const httpsOptions = {
 
 // Start HTTPS server on port 8443
 const httpsPort = process.env.HTTPS_PORT || 8443;
-const server = https.createServer(httpsOptions, app).listen(httpsPort, () => {
+https.createServer(httpsOptions, app).listen(httpsPort, () => {
   console.log(`HTTPS server running on https://localhost:${httpsPort}`);
 });
 
-module.exports = { app, server };
+// Start HTTP server (optional, only if you also want HTTP)
+const httpPort = process.env.HTTP_PORT || 5000;
+app.listen(httpPort, () => {
+  console.log(`HTTP server running on http://localhost:${httpPort}`);
+});
+
+module.exports = { app };

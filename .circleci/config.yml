@@ -26,9 +26,6 @@ jobs:
       - run:
           name: Update npm version
           command: npm install -g npm@10.8.2
-      - run:
-          name: Set Node.js options
-          command: echo 'export NODE_OPTIONS=--openssl-legacy-provider' >> ~/.bashrc && source ~/.bashrc
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
@@ -36,7 +33,7 @@ jobs:
           command: npm install
       - run:
           name: Build React app
-          command: npm run build
+          command: NODE_OPTIONS=--openssl-legacy-provider npm run build
       - run:
           name: Run tests
           command: npm test

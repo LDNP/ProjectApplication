@@ -28,7 +28,7 @@ jobs:
           command: npm install -g npm@10.8.2
       - run:
           name: Set Node.js options
-          command: export NODE_OPTIONS=--openssl-legacy-provider
+          command: echo 'export NODE_OPTIONS=--openssl-legacy-provider' >> ~/.bashrc && source ~/.bashrc
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:

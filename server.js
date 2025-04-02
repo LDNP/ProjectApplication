@@ -13,6 +13,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json()); // Parse JSON request bodies
 
+// Serve static files from React's build folder - MOVED BEFORE API ROUTES
+app.use(express.static(path.join(__dirname, 'build')));
+
 // Initialize SQLite database
 const db = new sqlite3.Database('./books.db', (err) => {
   if (err) {
@@ -31,8 +34,8 @@ db.run(`
   )
 `);
 
-// API Routes
-app.get('/', (_, res) => {
+// API Routes - Moved under /api prefix
+app.get('/api', (_, res) => {
   res.send('Hello from the backend!');
 });
 
@@ -90,9 +93,6 @@ app.delete('/books/:id', (req, res) => {
   });
 });
 
-// Serve static files from React's build folder
-app.use(express.static(path.join(__dirname, 'build')));
-
 // Serve React index.html for unknown routes (for React Router)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
@@ -104,9 +104,15 @@ const httpsOptions = {
   cert: fs.readFileSync(path.join(__dirname, 'certs', 'server.crt')),
 };
 
-// Start HTTPS server on port 8443, binding to all network interfaces
+// Add error handling for HTTPS server
 const httpsPort = process.env.HTTPS_PORT || 8443;
-https.createServer(httpsOptions, app).listen(httpsPort, '0.0.0.0', () => {
+const httpsServer = https.createServer(httpsOptions, app);
+
+httpsServer.on('error', (err) => {
+  console.error('HTTPS server error:', err);
+});
+
+httpsServer.listen(httpsPort, '0.0.0.0', () => {
   console.log(`HTTPS server running on port ${httpsPort}`);
 });
 

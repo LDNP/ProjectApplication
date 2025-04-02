@@ -76,8 +76,13 @@ app.delete('/books/:id', (req, res) => {
 });
 
 // Catch-all for React frontend
-app.get('*', (_, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
+app.get('*', (req, res, next) => {
+  const indexPath = path.join(buildPath, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).send('Frontend not built');
+  }
 });
 
 // HTTPS server setup

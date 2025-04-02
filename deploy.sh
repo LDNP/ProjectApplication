@@ -16,8 +16,8 @@ pm2 stop project_app || true
 npm install
 
 # Recreate certs (from environment variables set in CircleCI)
-echo "$PRIVATE_KEY" > certs/privatekey.pem
-echo "$SERVER" > certs/server.crt
+echo $PRIVATE_KEY > privatekey.pem 
+echo $SERVER > server.crt 
 
 # Build the frontend (only if needed)
 npm run build

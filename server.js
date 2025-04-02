@@ -3,6 +3,8 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
 // Initialize Express app
 const app = express();
@@ -30,7 +32,6 @@ db.run(`
 `);
 
 // API Routes
-
 app.get('/', (_, res) => {
   res.send('Hello from the backend!');
 });
@@ -89,18 +90,24 @@ app.delete('/books/:id', (req, res) => {
   });
 });
 
-// Serve static files from React's build folder
+// Serve static files from React build
 app.use(express.static(path.join(__dirname, 'build')));
 
-// Serve React index.html for unknown routes (for React Router)
+// Serve index.html on unknown routes (React Router fallback)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-// Server startup
-const port = process.env.PORT || 5000;
-const server = app.listen(port, () => {
-  console.log(`Backend running on http://localhost:${port}`);
+// SSL/TLS options from certs folder
+const httpsOptions = {
+  key: fs.readFileSync(path.join(__dirname, 'certs', 'privatekey.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'certs', 'server.crt')),
+};
+
+// Start HTTPS server on port 8443
+const httpsPort = process.env.HTTPS_PORT || 8443;
+const server = https.createServer(httpsOptions, app).listen(httpsPort, () => {
+  console.log(`HTTPS server running on https://localhost:${httpsPort}`);
 });
 
 module.exports = { app, server };

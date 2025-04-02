@@ -12,9 +12,6 @@ cd ~/ProjectApplication || exit 1
 # Stop the current running application (if running)
 pm2 stop project_app || true
 
-# Export the NODE_OPTIONS environment variable to prevent build errors
-export NODE_OPTIONS=--openssl-legacy-provider
-
 # Install backend dependencies
 npm install
 

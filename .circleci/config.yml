@@ -26,6 +26,9 @@ jobs:
       - run:
           name: Update npm version
           command: npm install -g npm@10.8.2
+      - run:
+          name: Set Node.js options
+          command: export NODE_OPTIONS=--openssl-legacy-provider
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:

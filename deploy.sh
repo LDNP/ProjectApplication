@@ -12,17 +12,17 @@ cd ~/ProjectApplication || exit 1
 # Stop the current running application (if running)
 pm2 stop project_app || true
 
+# Export the NODE_OPTIONS environment variable to prevent build errors
+export NODE_OPTIONS=--openssl-legacy-provider
+
 # Install backend dependencies
 npm install
 
 # Build the frontend (only if needed)
 npm run build
 
-# Restart the app with PM2 using server.js
+# Start the application with PM2
 pm2 start server.js --name project_app
 
 # Save the PM2 process list so it starts on reboot
 pm2 save
-
-# Set PM2 to restart on reboot
-pm2 startup

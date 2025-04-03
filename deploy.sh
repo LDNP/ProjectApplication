@@ -16,9 +16,9 @@ pm2 stop project_app || true
 npm install
 
 # Create certs directory and save certificates from environment variables
-mkdir -p certs
-echo "$PRIVATE_KEY" > certs/privatekey.pem 
-echo "$SERVER" > certs/server.crt 
+echo "$PRIVATE_KEY" | sed 's/\\n/\n/g' > certs/privatekey.pem
+echo "$SERVER" | sed 's/\\n/\n/g' > certs/server.crt
+chmod 600 certs/privatekey.pem certs/server.crt 
 
 # Build the frontend (only if needed)
 NODE_OPTIONS=--openssl-legacy-provider npm run build

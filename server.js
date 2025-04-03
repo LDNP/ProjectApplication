@@ -85,10 +85,9 @@ app.get('*', (req, res, next) => {
   }
 });
 
-// HTTPS server setup
 const httpsOptions = {
-  key: fs.readFileSync(path.join(__dirname, 'certs', 'privatekey.pem')),
-  cert: fs.readFileSync(path.join(__dirname, 'certs', 'server.crt')),
+  key: fs.readFileSync(path.join(__dirname, 'privatekey.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'server.crt')),
 };
 
 const PORT = process.env.HTTPS_PORT || 8443;
